@@ -58,10 +58,6 @@ class Birthday(Field):
             self.__value = new_val.date()
         else:
             raise ValueError
-
-class Birthday(Field):
-    ...
-     # реалізація класу
     
 class Record:
     def __init__(self, name, birthday=None):
