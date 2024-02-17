@@ -64,7 +64,7 @@ class Birthday(Field):
             raise ValueError
     
 class Record:
-    def __init__(self, name, birthday=None):
+    def __init__(self, name, birthday=None, email=None):
         self.name = Name(name)
         self.birthday = Birthday(birthday) if birthday else None
         self.phones = []
@@ -132,7 +132,9 @@ class Record:
     def __str__(self):
         return (f"Contact name: {self.name.value}, "
                 f"phones: {'; '.join(p.value for p in self.phones) if self.phones else None}, "
-                f"birthday: {self.birthday.value if self.birthday else None}")
+                f"birthday: {self.birthday.value if self.birthday else None}",
+                f"email: {self.email}")
+
    
 class AddressBook(UserDict):
     min_len = 0
