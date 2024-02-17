@@ -94,11 +94,12 @@ class Record:
 
     @email.setter
     def email(self, value):
-        email_field = Email(value)
-        if email_field.valid(value):
-            self._email = email_field.value
-        else:
-            raise ValueError("Invalid email address")
+        if value is not None:
+            email_field = Email(value)
+            if email_field.valid(value):
+                self._email = email_field.value
+            else:
+                raise ValueError("Invalid email address")
 
     def days_to_birthday(self): #Треба додати взаємодію з Birthday
         if self.birthday:
@@ -152,7 +153,6 @@ class Record:
     def __str__(self):
         return (f"Contact name: {self.name.value}, "
                 f"phones: {'; '.join(p.value for p in self.phones) if self.phones else None}, "
-                f"birthday: {self.birthday.value if self.birthday else None}, "
                 f"address: {self.address.value if self.address else None}, "
                 f"birthday: {self.birthday.value if self.birthday else None}, "
                 f"email: {self.email}")
