@@ -62,11 +62,28 @@ class Birthday(Field):
             self.__value = new_val.date()
         else:
             raise ValueError
+
+# basic class with no extra validation, could be expanded
+class Address(Field):
+    def __init__(self, value):
+        super().__init__(value)
+
+    @property
+    def value(self):
+        return self.__value
+
+    @value.setter
+    def value(self, value):
+        if len(value) != 0:
+            self.__value = value
+        else:
+            raise ValueError
     
 class Record:
-    def __init__(self, name, birthday=None, email=None):
+    def __init__(self, name, birthday=None, address=None, email=None):
         self.name = Name(name)
         self.birthday = Birthday(birthday) if birthday else None
+        self.address = Address(address) if address else None
         self.phones = []
         self._email = None
         self.email = email
@@ -106,6 +123,9 @@ class Record:
         except ValueError:
             print('Wrong date format! Enter the date in format year-month-day!')
 
+    def add_address(self, address):
+        self.address = Address(address)
+
     def remove_phone(self, phone):
         if phone in [p.value for p in self.phones]:
             for p in self.phones:
@@ -133,9 +153,9 @@ class Record:
     def __str__(self):
         return (f"Contact name: {self.name.value}, "
                 f"phones: {'; '.join(p.value for p in self.phones) if self.phones else None}, "
+                f"address: {self.address.value if self.address else None}, "
                 f"birthday: {self.birthday.value if self.birthday else None}, "
                 f"email: {self.email}")
-
    
 class AddressBook(UserDict):
     min_len = 0
@@ -250,3 +270,5 @@ if __name__ == '__main__':
 
     # Adding John's record to address book
     book.add_record(john_record)
+    john_record.add_address('Nowhere')
+    print(john_record.address.value)
