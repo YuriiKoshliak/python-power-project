@@ -132,7 +132,9 @@ class Record:
     def __str__(self):
         return (f"Contact name: {self.name.value}, "
                 f"phones: {'; '.join(p.value for p in self.phones) if self.phones else None}, "
-                f"birthday: {self.birthday.value if self.birthday else None}")
+                f"birthday: {self.birthday.value if self.birthday else None}",
+                f"email: {self.email}")
+
    
 class AddressBook(UserDict):
     min_len = 0
