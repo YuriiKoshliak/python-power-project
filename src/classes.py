@@ -10,6 +10,10 @@ class Field:
     def __str__(self):
         return str(self.__value)
         
+class Email(Field):
+    def valid(self, value):
+        email_pattern = re.compile(r"[^@]+@[^@]+\.[^@]+")
+        return bool(email_pattern.match(value))
 
 class Name(Field):
     def __init__(self, value):
@@ -64,6 +68,20 @@ class Record:
         self.name = Name(name)
         self.birthday = Birthday(birthday) if birthday else None
         self.phones = []
+        self._email = None
+        self.email = email
+
+    @property
+    def email(self):
+        return self._email
+
+    @email.setter
+    def email(self, value):
+        email_field = Email(value)
+        if email_field.valid(value):
+            self._email = email_field.value
+        else:
+            raise ValueError("Invalid email address")
 
     def days_to_birthday(self): #Треба додати взаємодію з Birthday
         if self.birthday:
