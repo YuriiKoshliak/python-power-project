@@ -10,6 +10,10 @@ class Field:
     def __str__(self):
         return str(self.__value)
         
+class Email(Field):
+    def valid(self, value):
+        email_pattern = re.compile(r"[^@]+@[^@]+\.[^@]+")
+        return bool(email_pattern.match(value))
 
 class Name(Field):
     def __init__(self, value):
@@ -76,11 +80,25 @@ class Address(Field):
             raise ValueError
     
 class Record:
-    def __init__(self, name, birthday=None, address=None):
+    def __init__(self, name, birthday=None, address=None, email=None):
         self.name = Name(name)
         self.birthday = Birthday(birthday) if birthday else None
         self.address = Address(address) if address else None
         self.phones = []
+        self._email = None
+        self.email = email
+
+    @property
+    def email(self):
+        return self._email
+
+    @email.setter
+    def email(self, value):
+        email_field = Email(value)
+        if email_field.valid(value):
+            self._email = email_field.value
+        else:
+            raise ValueError("Invalid email address")
 
     def days_to_birthday(self): #Треба додати взаємодію з Birthday
         if self.birthday:
@@ -135,7 +153,9 @@ class Record:
         return (f"Contact name: {self.name.value}, "
                 f"phones: {'; '.join(p.value for p in self.phones) if self.phones else None}, "
                 f"birthday: {self.birthday.value if self.birthday else None}, "
-                f"address: {self.address.value if self.address else None}")
+                f"address: {self.address.value if self.address else None}, "
+                f"birthday: {self.birthday.value if self.birthday else None}, "
+                f"email: {self.email}")
    
 class AddressBook(UserDict):
     min_len = 0
@@ -145,10 +165,10 @@ class AddressBook(UserDict):
             self.data[record.name.value] = record   
         except ValueError:
             print('Failed to add the record!')
-
+            
     def find(self, name):
-        return self.data[name] if name in self.data else None
-
+        return self.data[name] if name in self.data else None 
+      
     def delete(self, name):
         self.data.pop(name) if name in self.data else None
 
@@ -177,7 +197,66 @@ class AddressBook(UserDict):
             
             self.min_len += end+self.min_len
 
-        raise StopIteration
+        raise StopIteration    
+ 
+class TegNote(Field):
+    def __init__(self, value=None):
+        super().__init__(value)
+
+
+class BodyOfNote(Field):
+    def __init__(self, value):
+        super().__init__(value)
+
+
+class Notes(UserDict):
+    def __init__(self, body_of_note, teg=None):
+        super().__init__()
+        self.count = 0
+        self.teg = TegNote(teg)
+        self.text = BodyOfNote(body_of_note)
+
+    def __str__(self):
+        return f"Note {self.count}: /n {self.teg} /n {self.text}"
+    
+    def add_note(self):
+        self.count += 1
+        self.data[self.count] = [self.teg, self.text]
+
+    def find_note(self, word: str, idx=None):
+        if idx is None:
+            for key, value in self.data.items():
+                if value[0].find(word) != -1 or value[1].find(word) != -1:
+                    return self.data[key]
+                else:
+                    continue
+        else:
+            return self.data[idx]
+        
+    def delete_note(self, word: str, idx=None):
+        if idx is None:
+            for key, value in self.data.items():
+                if value[0].find(word) != -1 or value[1].find(word) != -1:
+                    return self.data.pop(key)
+                else:
+                    continue
+        else:
+            return self.data.pop(idx)
+        
+    def edite_note(self, idx, new_text: str):
+        self.data[idx] = new_text
+        return self.data[idx]
+
+    def add_note_teg(self, idx, teg: str):
+        if self.data[idx][0] is None:
+            self.data[idx][0] = teg
+        else:
+            return f'Notes nr.{idx} have a tags. You must change it.'
+
+    def sort_not_for_teg(self):
+        pass
+
+   
 
 if __name__ == '__main__':
     book = AddressBook()
