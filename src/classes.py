@@ -64,7 +64,7 @@ class Birthday(Field):
             raise ValueError
     
 class Record:
-    def __init__(self, name, birthday=None):
+    def __init__(self, name, birthday=None, email=None):
         self.name = Name(name)
         self.birthday = Birthday(birthday) if birthday else None
         self.phones = []
