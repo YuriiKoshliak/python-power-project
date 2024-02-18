@@ -1,16 +1,16 @@
-from classes import AddressBook, Record, Address, Birthday, Phone, Name
+from classes import AddressBook, Record, Notes, BodyOfNote, TegNote
 import pickle
 import re
 
 
+NOTEBOOK = AddressBook()
+FILE_NAME = 'data.bin'
+NOTES = Notes()
 contacts = {}
 phone_pattern = r'\d+'
 name_pattern = r'[a-zA-Z_]+'
-operator_pattern = r'(delete phone)|(show all)|(good bye)|[a-zA-Z_]+\s?'
+operator_pattern = r'(edit note)|(add note)|(delete note)|(delete phone)|(show all)|(good bye)|[a-zA-Z_]+\s?'
 phone_operator_pattern = r'(add)|(change)|(delete phone)'
-NOTEBOOK = AddressBook()
-FILE_NAME = 'data.bin'
-
 
 # Remove spaces at the beginning and at the end of the string and lower case the string
 def operator_handler(operator):
@@ -104,6 +104,40 @@ def add_email(operator):
     else:
         return f'Woopsie no contact with {contactData[0]} name!'
 
+# Notes functions
+def add_note(operator):
+    trimmed = re.sub('add note', '', operator).strip()
+    note = BodyOfNote(trimmed)
+
+    NOTES.add_note(note)
+
+    return f'Note added!'
+
+def find_note(operator):
+    trimmed = re.sub('note', '', operator).strip()
+    note = NOTES.find_note(trimmed)
+
+    return note
+
+def edit_note(operator):
+    trimmed = re.sub('edit note', '', operator).strip()
+    index = re.search(r'[0-9]+', trimmed).group().capitalize()
+    new_text = re.sub(index, '', trimmed).strip()
+
+    NOTES.edite_note(index, new_text)
+    
+    return f'Note {index} was updated!'
+
+def delete_note(operator):
+    trimmed = re.sub('delete note', '', operator).strip()
+    NOTES.delete_note(trimmed)
+
+    return f'Note {trimmed} was deleted!'
+
+def show_notes(operator):
+    # для цього краще реалізувати ітератор в класі
+    print(NOTES.data)
+
 # Update the contact number
 def change(operator):
     phoneName = operand_maker(operator)[0]
@@ -165,12 +199,11 @@ def show_all(operator):
 # Simple farewell function
 def goodbye(operator):
     save_notebook(operator)
-    return 'Good bye!'
+    return 'Your data is saved! Good bye!'
 
 # saving a notebook
 def save_notebook(operator):
     try:
-        print('inside the save function')
         with open (FILE_NAME, "wb") as file:
             pickle.dump(NOTEBOOK.data, file)
             
@@ -200,6 +233,12 @@ def commands(operator):
         To sava data as file or work with saved book use next commands: \n \
         Type "save" to save the address book (rewrite old book!!!) \n \
         Type "load" to open saved file \n \
+        To work with notes use next commands: \n \
+        Type "add note [text]" to add new note.\n \
+        Type "change [name] [old phone number] [new phone number]" to add new contact.\n \
+        Type "note [id] find note.\n \
+        Type "delete note [id] to delete note.\n \
+        Type "notes to see all notes.\n \
         And the ultimate command: \n \
         Type "end" to exit'
 
@@ -211,6 +250,11 @@ OPERATIONS = {
     'delete': delete,
     'contact': contact,
     'show all': show_all,
+    'add note': add_note,
+    'note': find_note,
+    'delete note': delete_note,
+    'edit note': edit_note,
+    'notes': show_notes,
     'goodbye': goodbye,
     'birthday': add_birthday,
     'address': add_address,

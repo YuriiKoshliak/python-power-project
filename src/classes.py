@@ -79,7 +79,6 @@ class Address(Field):
         else:
             raise ValueError
     
-    
 class Record:
     def __init__(self, name, birthday=None, address=None, email=None):
         self.name = Name(name)
