@@ -260,6 +260,9 @@ class AddressBook(UserDict):
 
     def delete_the_note(self, word):
         return self.notes.delete_note(word)
+      
+    def show_all_notes(self):
+        return self.notes.data
                      
     def __iter__(self):
         return self
@@ -303,3 +306,4 @@ if __name__ == '__main__':
     book.add_record(john_record)
     john_record.add_address('Nowhere')
     print(john_record.address.value)
+
