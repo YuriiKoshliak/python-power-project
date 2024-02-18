@@ -114,7 +114,6 @@ class Notes(UserDict):
                     return self.data.pop(key)
                 else:
                     continue
-
         
     def edite_note(self, idx, new_text: str):
         self.data[int(idx)] = new_text
@@ -140,5 +139,24 @@ class Notes(UserDict):
 
    
 class AddressBook(UserDict):
-    ...
-    # реалізація класу
+    def __init__(self):
+        self.notes = Notes()
+    
+    def write_note(self, body_of_note, teg=None):
+        return self.notes.add_note(body_of_note, teg)
+
+    def add_teg_to_note(self, idx, teg):
+        return self.notes.add_note_teg(idx,teg)
+
+    def change_note(self, idx, text):
+        return self.notes.edite_note(idx, text)
+
+    def search_of_note(self, word):
+        return self.notes.find_note(word)
+
+    def sorting_of_notes(self):
+        return self.notes.sort_note_for_teg()
+
+    def delete_the_note(self, word):
+        return self.notes.delete_note(word)
+
