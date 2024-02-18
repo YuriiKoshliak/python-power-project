@@ -68,6 +68,75 @@ class Record:
                 f"birthday: {self.birthday.value if self.birthday else None}")
 
 
+class TegNote(Field):
+    def __init__(self, value=None):
+        super().__init__(value)
+
+
+class BodyOfNote(Field):
+    def __init__(self, value):
+        super().__init__(value)
+
+
+class Notes(UserDict):
+    def __init__(self):
+        super().__init__()
+        self.count = 0
+        self.teg = ''
+        self.text = ''
+
+    def __str__(self):
+        return f"Note {self.count}: /n {self.teg} /n {self.text}"
+    
+    def add_note(self, body_of_note, teg=None):
+        self.count += 1
+        self.teg = TegNote(teg)
+        self.text = BodyOfNote(body_of_note)
+        self.data[self.count] = [self.teg, self.text]
+        return self.data[self.count]
+
+    def find_note(self, idx: str):
+        if idx.isdigit():
+            return self.data.get(int(idx))
+        else:
+            for key, value in self.data.items():
+                if str(value[0]).find(idx) != -1 or str(value[1]).find(idx) != -1:
+                    return self.data.get(key)
+                else:
+                    continue
+        
+    def delete_note(self, idx: str):
+        if idx.isdigit():
+            return self.data.pop(int(idx))
+        else:
+            for key, value in self.data.items():
+                if str(value[0]).find(idx) != -1 or str(value[1]).find(idx) != -1:
+                    return self.data.pop(key)
+                else:
+                    continue
+
+        
+    def edite_note(self, idx, new_text: str):
+        self.data[int(idx)] = new_text
+        return self.data[int(idx)]
+
+    def add_note_teg(self, idx, teg: str):
+        if self.data.get(idx) == '':
+            self.data[int(idx)][0] = teg
+        else:
+            return f'Notes nr.{idx} have a tags. You must change it.'
+
+    def sort_note_for_teg(self):
+        self.list_tegs = []
+        for i in self.data.values():
+            self.list_tegs.append(str(i[0]))
+        self.list_tegs.sort()
+        for n in self.list_tegs:
+            for key, value in self.data.items():
+                if str(value[0]) == str(n):
+                    return self.data.get(key)
+                else:
+                    continue
 
    
 class AddressBook(UserDict):
