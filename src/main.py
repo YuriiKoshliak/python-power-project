@@ -23,8 +23,7 @@ def main(operator) -> str:
 
     print(handler(operator))
 
-
-if __name__ == '__main__':
+def entry_point():
     while waiting == True:
         operator = input(":")
         if operator in goodbyes:
@@ -32,3 +31,6 @@ if __name__ == '__main__':
             break 
         else: 
             main(operator)
+
+if __name__ == '__main__':
+    entry_point()
