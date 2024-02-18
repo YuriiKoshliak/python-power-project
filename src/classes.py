@@ -229,6 +229,7 @@ class AddressBook(UserDict):
     min_len = 0
     
     def __init__(self):
+        super().__init__()
         self.notes = Notes()
         
     def add_record(self, record: Record):
