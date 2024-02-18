@@ -1,17 +1,16 @@
-from classes import AddressBook, Record, Address, Birthday, Phone, Name
+from classes import AddressBook, Record, Notes, BodyOfNote, TegNote
 import pickle
 import re
-# import classes
 
 
+NOTEBOOK = AddressBook()
+FILE_NAME = 'data.bin'
+NOTES = Notes()
 contacts = {}
 phone_pattern = r'\d+'
 name_pattern = r'[a-zA-Z_]+'
-operator_pattern = r'(delete phone)|(show all)|(good bye)|[a-zA-Z_]+\s?'
+operator_pattern = r'(edit note)|(add note)|(delete note)|(delete phone)|(show all)|(good bye)|[a-zA-Z_]+\s?'
 phone_operator_pattern = r'(add)|(change)|(delete phone)'
-NOTEBOOK = AddressBook()
-FILE_NAME = 'data.bin'
-
 
 # Remove spaces at the beginning and at the end of the string and lower case the string
 def operator_handler(operator):
@@ -38,12 +37,21 @@ def operand_maker(operator):
 
     return operands
 
+# function to trim operator and name for email, adddress, birthday
+def operator_trimmer(pattern: str, operator):
+    trimmed = re.sub(pattern, '', operator)
+    phoneName = re.search(name_pattern, trimmed).group().capitalize()
+    userData = re.sub(phoneName, '', trimmed).strip() if re.search(phoneName, trimmed) \
+        else re.sub(phoneName.casefold(), '', trimmed).strip()
+    
+    return [phoneName, userData]
+
 #Simple welcome function
 def hello(operator):
     return 'How can I help you?'
 
 # Adds a phone number to the contacts list
-def add(operator):
+def add_contact(operator):
     phoneName = operand_maker(operator)[0]
     phoneNum = operand_maker(operator)[1]
 
@@ -61,34 +69,74 @@ def add(operator):
         return f'Contact {phoneName} has been added!' 
 
 # Adds a birthday to the contacts
-def birthday(operator):
-    trimmed = re.sub('birthday', '', operator)
-    phoneName = re.search(name_pattern, trimmed).group().capitalize()
-    bDay = re.sub(phoneName, '', trimmed).strip()
+def add_birthday(operator):
+    contactData = operator_trimmer('birthday', operator)
 
-    record = NOTEBOOK.find(phoneName)
+    record = NOTEBOOK.find(contactData[0])
     if record != None:
-        record.add_birthday(bDay)
+        record.add_birthday(contactData[1])
 
-        return f'Contact {phoneName} has a birthday now!'   
+        return f'Contact {contactData[0]} has a birthday now!'   
     else:
-        return f'Woopsie no contact with {phoneName} name!' 
+        return f'Woopsie no contact with {contactData[0]} name!' 
 
-def address(operator):
-    trimmed = re.sub('address', '', operator)
-    phoneName = re.search(name_pattern, trimmed).group().capitalize()
-    addressData = re.sub(phoneName, '', trimmed).strip()
+# Adds the address to the contacts
+def add_address(operator):
+    contactData = operator_trimmer('address', operator)
 
-    record = NOTEBOOK.find(phoneName)
+    record = NOTEBOOK.find(contactData[0])
     if record != None:
-        record.add_address(addressData)
+        record.add_address(contactData[1])
 
-        return f'Contact {phoneName} has a address now!'   
+        return f'Contact {contactData[0]} has a address {contactData[1]} now!'   
     else:
-        return f'Woopsie no contact with {phoneName} name!'
+        return f'Woopsie no contact with {contactData[0]} name!'
 
-def email(operator):
-    ...
+# Adds the email to the contacts
+def add_email(operator):
+    contactData = operator_trimmer('email', operator)
+
+    record = NOTEBOOK.find(contactData[0])
+    if record != None:
+        record.email = contactData[1]
+
+        return f'Contact {contactData[0]} has a address {contactData[1]} now!'   
+    else:
+        return f'Woopsie no contact with {contactData[0]} name!'
+
+# Notes functions
+def add_note(operator):
+    trimmed = re.sub('add note', '', operator).strip()
+    note = BodyOfNote(trimmed)
+
+    NOTES.add_note(note)
+
+    return f'Note added!'
+
+def find_note(operator):
+    trimmed = re.sub('note', '', operator).strip()
+    note = NOTES.find_note(trimmed)
+
+    return note
+
+def edit_note(operator):
+    trimmed = re.sub('edit note', '', operator).strip()
+    index = re.search(r'[0-9]+', trimmed).group().capitalize()
+    new_text = re.sub(index, '', trimmed).strip()
+
+    NOTES.edite_note(index, new_text)
+    
+    return f'Note {index} was updated!'
+
+def delete_note(operator):
+    trimmed = re.sub('delete note', '', operator).strip()
+    NOTES.delete_note(trimmed)
+
+    return f'Note {trimmed} was deleted!'
+
+def show_notes(operator):
+    # для цього краще реалізувати ітератор в класі
+    print(NOTES.data)
 
 # Update the contact number
 def change(operator):
@@ -101,6 +149,15 @@ def change(operator):
     return f'Contact {phoneName} has been updated!'
 
 # Delete the contact number for a certain contact
+def delete_phone(operator):
+    phoneName = operand_maker(operator)[0]
+    phoneNums = operand_maker(operator)[1]
+
+    contact = NOTEBOOK.find(phoneName)
+    contact.remove_phone(phoneNums[0])
+
+    return f'Phone {phoneNums[0]} was deleted fron contact {phoneName}!'
+
 def delete_phone(operator):
     phoneName = operand_maker(operator)[0]
     phoneNums = operand_maker(operator)[1]
@@ -142,12 +199,11 @@ def show_all(operator):
 # Simple farewell function
 def goodbye(operator):
     save_notebook(operator)
-    return 'Good bye!'
+    return 'Your data is saved! Good bye!'
 
 # saving a notebook
 def save_notebook(operator):
     try:
-        print('inside the save function')
         with open (FILE_NAME, "wb") as file:
             pickle.dump(NOTEBOOK.data, file)
             
@@ -177,21 +233,33 @@ def commands(operator):
         To sava data as file or work with saved book use next commands: \n \
         Type "save" to save the address book (rewrite old book!!!) \n \
         Type "load" to open saved file \n \
+        To work with notes use next commands: \n \
+        Type "add note [text]" to add new note.\n \
+        Type "change [name] [old phone number] [new phone number]" to add new contact.\n \
+        Type "note [id] find note.\n \
+        Type "delete note [id] to delete note.\n \
+        Type "notes to see all notes.\n \
         And the ultimate command: \n \
         Type "end" to exit'
 
 OPERATIONS = {
     'hello': hello,
-    'add': add,
+    'add': add_contact,
     'change': change,
     'delete phone': delete_phone,
     'delete': delete,
     'contact': contact,
     'show all': show_all,
+    'add note': add_note,
+    'note': find_note,
+    'delete note': delete_note,
+    'edit note': edit_note,
+    'notes': show_notes,
     'goodbye': goodbye,
-    'birthday': birthday,
-    'address': address,
+    'birthday': add_birthday,
+    'address': add_address,
     'save': save_notebook,
+    'email': add_email,
     'load': load_notebook,
     'help': commands
 }
