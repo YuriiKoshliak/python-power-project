@@ -117,9 +117,9 @@ def add_teg(operator):
     trimmed = re.sub('add teg', '', operator).strip()
     index = re.search(r'[0-9]+', trimmed).group().capitalize()
     teg = re.sub(index, '', trimmed).strip()
-
+    
     NOTEBOOK.add_teg_to_note(index, teg)
-
+    
     return f'Note {index} has teg: {teg}.'
 
 def find_note(operator):
@@ -134,7 +134,7 @@ def edit_note(operator):
     new_text = re.sub(index, '', trimmed).strip()
 
     NOTEBOOK.change_note(index, new_text)
-    
+   
     return f'Note {index} was updated!'
 
 def delete_note(operator):
