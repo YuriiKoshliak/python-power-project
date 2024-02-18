@@ -62,7 +62,7 @@ class Birthday(Field):
             self.__value = new_val.date()
         else:
             raise ValueError
-
+            
 # basic class with no extra validation, could be expanded
 class Address(Field):
     def __init__(self, value):
@@ -78,6 +78,7 @@ class Address(Field):
             self.__value = value
         else:
             raise ValueError
+    
     
 class Record:
     def __init__(self, name, birthday=None, address=None, email=None):
@@ -156,10 +157,80 @@ class Record:
                 f"address: {self.address.value if self.address else None}, "
                 f"birthday: {self.birthday.value if self.birthday else None}, "
                 f"email: {self.email}")
-   
+
+class TegNote(Field):
+    def __init__(self, value=None):
+        super().__init__(value)
+
+class BodyOfNote(Field):
+    def __init__(self, value):
+        super().__init__(value)
+
+class Notes(UserDict):
+    def __init__(self):
+        super().__init__()
+        self.count = 0
+        self.teg = ''
+        self.text = ''
+
+    def __str__(self):
+        return f"Note {self.count}: /n {self.teg} /n {self.text}"
+    
+    def add_note(self, body_of_note, teg=None):
+        self.count += 1
+        self.teg = TegNote(teg)
+        self.text = BodyOfNote(body_of_note)
+        self.data[self.count] = [self.teg, self.text]
+        return self.data[self.count]
+
+    def find_note(self, idx: str):
+        if idx.isdigit():
+            return self.data.get(int(idx))
+        else:
+            for key, value in self.data.items():
+                if str(value[0]).find(idx) != -1 or str(value[1]).find(idx) != -1:
+                    return self.data.get(key)
+                else:
+                    continue
+        
+    def delete_note(self, idx: str):
+        if idx.isdigit():
+            return self.data.pop(int(idx))
+        else:
+            for key, value in self.data.items():
+                if str(value[0]).find(idx) != -1 or str(value[1]).find(idx) != -1:
+                    return self.data.pop(key)
+                else:
+                    continue
+        
+    def edite_note(self, idx, new_text: str):
+        self.data[int(idx)] = new_text
+        return self.data[int(idx)]
+
+    def add_note_teg(self, idx, teg: str):
+        if self.data.get(idx) == '':
+            self.data[int(idx)][0] = teg
+        else:
+            return f'Notes nr.{idx} have a tags. You must change it.'
+
+    def sort_note_for_teg(self):
+        self.list_tegs = []
+        for i in self.data.values():
+            self.list_tegs.append(str(i[0]))
+        self.list_tegs.sort()
+        for n in self.list_tegs:
+            for key, value in self.data.items():
+                if str(value[0]) == str(n):
+                    return self.data.get(key)
+                else:
+                    continue
+                    
 class AddressBook(UserDict):
     min_len = 0
-
+    
+    def __init__(self):
+        self.notes = Notes()
+        
     def add_record(self, record: Record):
         try:
             self.data[record.name.value] = record   
@@ -171,7 +242,25 @@ class AddressBook(UserDict):
       
     def delete(self, name):
         self.data.pop(name) if name in self.data else None
+        
+    def write_note(self, body_of_note, teg=None):
+        return self.notes.add_note(body_of_note, teg)
 
+    def add_teg_to_note(self, idx, teg):
+        return self.notes.add_note_teg(idx,teg)
+
+    def change_note(self, idx, text):
+        return self.notes.edite_note(idx, text)
+
+    def search_of_note(self, word):
+        return self.notes.find_note(word)
+
+    def sorting_of_notes(self):
+        return self.notes.sort_note_for_teg()
+
+    def delete_the_note(self, word):
+        return self.notes.delete_note(word)
+                     
     def __iter__(self):
         return self
 
@@ -198,65 +287,6 @@ class AddressBook(UserDict):
             self.min_len += end+self.min_len
 
         raise StopIteration    
- 
-class TegNote(Field):
-    def __init__(self, value=None):
-        super().__init__(value)
-
-
-class BodyOfNote(Field):
-    def __init__(self, value):
-        super().__init__(value)
-
-
-class Notes(UserDict):
-    def __init__(self, body_of_note, teg=None):
-        super().__init__()
-        self.count = 0
-        self.teg = TegNote(teg)
-        self.text = BodyOfNote(body_of_note)
-
-    def __str__(self):
-        return f"Note {self.count}: /n {self.teg} /n {self.text}"
-    
-    def add_note(self):
-        self.count += 1
-        self.data[self.count] = [self.teg, self.text]
-
-    def find_note(self, word: str, idx=None):
-        if idx is None:
-            for key, value in self.data.items():
-                if value[0].find(word) != -1 or value[1].find(word) != -1:
-                    return self.data[key]
-                else:
-                    continue
-        else:
-            return self.data[idx]
-        
-    def delete_note(self, word: str, idx=None):
-        if idx is None:
-            for key, value in self.data.items():
-                if value[0].find(word) != -1 or value[1].find(word) != -1:
-                    return self.data.pop(key)
-                else:
-                    continue
-        else:
-            return self.data.pop(idx)
-        
-    def edite_note(self, idx, new_text: str):
-        self.data[idx] = new_text
-        return self.data[idx]
-
-    def add_note_teg(self, idx, teg: str):
-        if self.data[idx][0] is None:
-            self.data[idx][0] = teg
-        else:
-            return f'Notes nr.{idx} have a tags. You must change it.'
-
-    def sort_not_for_teg(self):
-        pass
-
-   
 
 if __name__ == '__main__':
     book = AddressBook()
