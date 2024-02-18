@@ -71,5 +71,5 @@ class Record:
 
    
 class AddressBook(UserDict):
-    ...
-    # реалізація класу
+    def show_all_notes(self):
+        return self.notes.data
