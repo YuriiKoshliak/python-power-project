@@ -1,7 +1,6 @@
 from classes import AddressBook, Record, Address, Birthday, Phone, Name
 import pickle
 import re
-# import classes
 
 
 contacts = {}
@@ -38,12 +37,21 @@ def operand_maker(operator):
 
     return operands
 
+# function to trim operator and name for email, adddress, birthday
+def operator_trimmer(pattern: str, operator):
+    trimmed = re.sub(pattern, '', operator)
+    phoneName = re.search(name_pattern, trimmed).group().capitalize()
+    userData = re.sub(phoneName, '', trimmed).strip() if re.search(phoneName, trimmed) \
+        else re.sub(phoneName.casefold(), '', trimmed).strip()
+    
+    return [phoneName, userData]
+
 #Simple welcome function
 def hello(operator):
     return 'How can I help you?'
 
 # Adds a phone number to the contacts list
-def add(operator):
+def add_contact(operator):
     phoneName = operand_maker(operator)[0]
     phoneNum = operand_maker(operator)[1]
 
@@ -61,34 +69,40 @@ def add(operator):
         return f'Contact {phoneName} has been added!' 
 
 # Adds a birthday to the contacts
-def birthday(operator):
-    trimmed = re.sub('birthday', '', operator)
-    phoneName = re.search(name_pattern, trimmed).group().capitalize()
-    bDay = re.sub(phoneName, '', trimmed).strip()
+def add_birthday(operator):
+    contactData = operator_trimmer('birthday', operator)
 
-    record = NOTEBOOK.find(phoneName)
+    record = NOTEBOOK.find(contactData[0])
     if record != None:
-        record.add_birthday(bDay)
+        record.add_birthday(contactData[1])
 
-        return f'Contact {phoneName} has a birthday now!'   
+        return f'Contact {contactData[0]} has a birthday now!'   
     else:
-        return f'Woopsie no contact with {phoneName} name!' 
+        return f'Woopsie no contact with {contactData[0]} name!' 
 
-def address(operator):
-    trimmed = re.sub('address', '', operator)
-    phoneName = re.search(name_pattern, trimmed).group().capitalize()
-    addressData = re.sub(phoneName, '', trimmed).strip()
+# Adds the address to the contacts
+def add_address(operator):
+    contactData = operator_trimmer('address', operator)
 
-    record = NOTEBOOK.find(phoneName)
+    record = NOTEBOOK.find(contactData[0])
     if record != None:
-        record.add_address(addressData)
+        record.add_address(contactData[1])
 
-        return f'Contact {phoneName} has a address now!'   
+        return f'Contact {contactData[0]} has a address {contactData[1]} now!'   
     else:
-        return f'Woopsie no contact with {phoneName} name!'
+        return f'Woopsie no contact with {contactData[0]} name!'
 
-def email(operator):
-    ...
+# Adds the email to the contacts
+def add_email(operator):
+    contactData = operator_trimmer('email', operator)
+
+    record = NOTEBOOK.find(contactData[0])
+    if record != None:
+        record.email = contactData[1]
+
+        return f'Contact {contactData[0]} has a address {contactData[1]} now!'   
+    else:
+        return f'Woopsie no contact with {contactData[0]} name!'
 
 # Update the contact number
 def change(operator):
@@ -101,6 +115,15 @@ def change(operator):
     return f'Contact {phoneName} has been updated!'
 
 # Delete the contact number for a certain contact
+def delete_phone(operator):
+    phoneName = operand_maker(operator)[0]
+    phoneNums = operand_maker(operator)[1]
+
+    contact = NOTEBOOK.find(phoneName)
+    contact.remove_phone(phoneNums[0])
+
+    return f'Phone {phoneNums[0]} was deleted fron contact {phoneName}!'
+
 def delete_phone(operator):
     phoneName = operand_maker(operator)[0]
     phoneNums = operand_maker(operator)[1]
@@ -182,16 +205,17 @@ def commands(operator):
 
 OPERATIONS = {
     'hello': hello,
-    'add': add,
+    'add': add_contact,
     'change': change,
     'delete phone': delete_phone,
     'delete': delete,
     'contact': contact,
     'show all': show_all,
     'goodbye': goodbye,
-    'birthday': birthday,
-    'address': address,
+    'birthday': add_birthday,
+    'address': add_address,
     'save': save_notebook,
+    'email': add_email,
     'load': load_notebook,
     'help': commands
 }

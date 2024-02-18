@@ -266,6 +266,7 @@ if __name__ == '__main__':
     john_record.add_phone("1234567890")
     john_record.add_phone("5555555555")
     john_record.add_birthday("1994-01-20")
+    john_record.email = 'test@gmail.com'
     print(john_record)
 
     # Adding John's record to address book

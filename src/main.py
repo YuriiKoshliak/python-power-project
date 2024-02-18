@@ -1,11 +1,8 @@
-from classes import AddressBook, Record, Birthday, Phone, Name
-import handlers
+from handlers import get_handler
+
 
 waiting = True
 goodbyes = ("good bye", "close", "exit", "end", "bye")
-# creating a notebook
-# NOTEBOOK = AddressBook()
-# FILE_NAME = 'data.bin'
 
 # request-response cycle
 def main_action(func):
@@ -22,8 +19,7 @@ def main_action(func):
 
 @main_action
 def main(operator) -> str:
-    # handler = handlers.get_handler(operator)
-    handler = handlers.get_handler(operator)
+    handler = get_handler(operator)
 
     print(handler(operator))
 
