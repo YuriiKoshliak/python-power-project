@@ -113,9 +113,18 @@ def add_note(operator):
 
     return f'Note added!'
 
+def add_teg(operator):
+    trimmed = re.sub('add teg', '', operator).strip()
+    index = re.search(r'[0-9]+', trimmed).group().capitalize()
+    teg = re.sub(index, '', trimmed).strip()
+    
+    NOTEBOOK.add_teg_to_note(index, teg)
+    
+    return f'Note {index} has teg: {teg}.'
+
 def find_note(operator):
     trimmed = re.sub('note', '', operator).strip()
-    note = NOTES.find_note(trimmed)
+    note = NOTEBOOK.search_of_note(trimmed)
 
     return note
 
@@ -124,19 +133,26 @@ def edit_note(operator):
     index = re.search(r'[0-9]+', trimmed).group().capitalize()
     new_text = re.sub(index, '', trimmed).strip()
 
-    NOTES.edite_note(index, new_text)
-    
+    NOTEBOOK.change_note(index, new_text)
+   
     return f'Note {index} was updated!'
 
 def delete_note(operator):
     trimmed = re.sub('delete note', '', operator).strip()
-    NOTES.delete_note(trimmed)
+    NOTEBOOK.delete_the_note(trimmed)
 
     return f'Note {trimmed} was deleted!'
 
-def show_notes(operator):
+def sort_notes():
+    notes = NOTEBOOK.sorting_of_notes()
+
+    return notes
+
+def show_notes():
     # для цього краще реалізувати ітератор в класі
-    print(NOTES.data)
+    notes = NOTEBOOK.show_all_notes
+
+    return notes
 
 # Update the contact number
 def change(operator):
