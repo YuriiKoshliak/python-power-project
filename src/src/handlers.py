@@ -1,4 +1,5 @@
 from classes import AddressBook, Record, Notes, BodyOfNote, TegNote
+from cleaner import sorting
 import pickle
 import re
 
@@ -212,6 +213,10 @@ def show_all(operator):
     book_view = NOTEBOOK.custom_iterator(len(NOTEBOOK))
     return f'{next(book_view)}'
 
+# Launch cleaner
+def launch_cleaner(operator):
+    sorting()
+
 # Simple farewell function
 def goodbye(operator):
     save_notebook(operator)
@@ -241,12 +246,12 @@ def commands(operator):
         Type "contact [name of the contact]" to see its phone num.\n \
         Type "phone [phone of the contact]" to see if its exist.\n \
         Type "add [name] [phone number]" to add new contact.\n \
-        Type "change [name] [old phone number] [new phone number]" to add new contact.\n \
+        Type "change [name] [old phone number] [new phone number]" to change phone number.\n \
         Type "birthday [name] [birthday date in date format]" to add bDay to the contact.\n \
         Type "delete phone [name] [phone number]" to delete phone from the contact.\n \
         Type "delete [name]" to delte the contact.\n \
         Type "show all" to see all contacts \n \
-        To sava data as file or work with saved book use next commands: \n \
+        To save data as file or work with saved book use next commands: \n \
         Type "save" to save the address book (rewrite old book!!!) \n \
         Type "load" to open saved file \n \
         To work with notes use next commands: \n \
@@ -277,6 +282,7 @@ OPERATIONS = {
     'save': save_notebook,
     'email': add_email,
     'load': load_notebook,
+    'clean': launch_cleaner,
     'help': commands
 }
 
