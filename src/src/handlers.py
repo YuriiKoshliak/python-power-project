@@ -1,11 +1,14 @@
 from classes import AddressBook, Record, Notes, BodyOfNote, TegNote
+from cleaner import sorting
 import pickle
 import re
+from pathlib import Path
 
 
 NOTEBOOK = AddressBook()
 FILE_NAME = 'data.bin'
 NOTES = Notes()
+main_folder_path = None
 contacts = {}
 phone_pattern = r'\d+'
 name_pattern = r'[a-zA-Z_]+'
@@ -224,6 +227,12 @@ def show_all(operator):
     book_view = NOTEBOOK.custom_iterator(len(NOTEBOOK))
     return f'{next(book_view)}'
 
+# Launch cleaner
+def launch_cleaner(operator):
+    global main_folder_path
+    main_folder_path = Path(input('Enter the path for sorting and cleaning: '))
+    sorting()
+
 # Simple farewell function
 def goodbye(operator):
     save_notebook(operator)
@@ -254,7 +263,7 @@ def commands(operator):
         Type "contact [name of the contact]" to see its phone num.\n \
         Type "phone [phone of the contact]" to see if its exist.\n \
         Type "add [name] [phone number]" to add new contact.\n \
-        Type "change [name] [old phone number] [new phone number]" to add new contact.\n \
+        Type "change [name] [old phone number] [new phone number]" to change phone number.\n \
         Type "birthday [name] [birthday date in date format]" to add bDay to the contact.\n \
         Type "delete phone [name] [phone number]" to delete phone from the contact.\n \
         Type "delete [name]" to delte the contact.\n \
@@ -273,7 +282,9 @@ def commands(operator):
         Type "note [id/tag/word] find note.\n \
         Type "tag [id] to add tag.\n \
         Type "delete note [id] to delete note.\n \
-        Type "notes to see all notes.\n \
+        Type "notes" to see all notes.\n \
+            <-------------------------------->\n \
+        To launch cleaner type "clean" \n \
             <-------------------------------->\n \
         And the ultimate command: \n \
             \n \
@@ -300,6 +311,7 @@ OPERATIONS = {
     'save': save_notebook,
     'email': add_email,
     'load': load_notebook,
+    'clean': launch_cleaner,
     'help': commands
 }
 
