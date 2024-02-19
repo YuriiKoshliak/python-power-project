@@ -101,7 +101,7 @@ class Record:
             else:
                 raise ValueError("Invalid email address")
 
-    def days_to_birthday(self): #Треба додати взаємодію з Birthday
+    def days_to_birthday(self):
         if self.birthday:
             modified_date = self.birthday.value.replace(year=date.today().year + 1) \
             if self.birthday.value.month == 1 \
@@ -109,7 +109,7 @@ class Record:
         
             result = modified_date - date.today()
 
-            return result
+            return result.days
         else:
             return f'No B Day :('
         
@@ -263,6 +263,13 @@ class AddressBook(UserDict):
       
     def show_all_notes(self):
         return self.notes.data
+
+    def list_with_birthdays(self, days: int):
+        list = ''
+        for i in filter(lambda i: i.days_to_birthday() < days, self.data.values()):
+            list += f'{i}\n'
+        
+        return list
                      
     def __iter__(self):
         return self
@@ -295,15 +302,28 @@ if __name__ == '__main__':
     book = AddressBook()
 
     # Creating a record for John
-    john_record = Record("John")
-    john_record.add_phone("1234567890")
-    john_record.add_phone("5555555555")
-    john_record.add_birthday("1994-01-20")
-    john_record.email = 'test@gmail.com'
-    print(john_record)
+    test_record = Record("John")
+    test_record.add_phone("1234567890")
+    test_record.add_phone("5555555555")
+    test_record.add_birthday("1994-02-20")
+    test_record.email = 'test@gmail.com'
+    print(test_record)
+
+    test_record1 = Record("Jane")
+    test_record1.add_phone("1234567890")
+    test_record1.add_phone("5555555555")
+    test_record1.add_birthday("1994-02-22")
+
+    test_record2 = Record("Joe")
+    test_record2.add_phone("1234567890")
+    test_record2.add_phone("5555555555")
+    test_record2.add_birthday("1994-02-25")
 
     # Adding John's record to address book
-    book.add_record(john_record)
-    john_record.add_address('Nowhere')
-    print(john_record.address.value)
+    book.add_record(test_record)
+    book.add_record(test_record1)
+    book.add_record(test_record2)
+    test_record.add_address('Nowhere')
+    print(test_record.address.value)
 
+    print(book.list_with_birthdays(2))

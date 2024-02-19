@@ -138,6 +138,11 @@ def show_notes(operator):
     # для цього краще реалізувати ітератор в класі
     print(NOTES.data)
 
+def show_birthdays(operator):
+    trimmed = re.sub('birthdays', '', operator).strip()
+
+    return NOTEBOOK.list_with_birthdays(int(trimmed))
+
 # Update the contact number
 def change(operator):
     phoneName = operand_maker(operator)[0]
@@ -229,6 +234,7 @@ def commands(operator):
         Type "birthday [name] [birthday date in date format]" to add bDay to the contact.\n \
         Type "delete phone [name] [phone number]" to delete phone from the contact.\n \
         Type "delete [name]" to delte the contact.\n \
+        Type "birthdays [period of time in days]" to show the contacts with birthdays within this periond.\n \
         Type "show all" to see all contacts \n \
         To sava data as file or work with saved book use next commands: \n \
         Type "save" to save the address book (rewrite old book!!!) \n \
@@ -257,6 +263,7 @@ OPERATIONS = {
     'notes': show_notes,
     'goodbye': goodbye,
     'birthday': add_birthday,
+    'birthdays': show_birthdays,
     'address': add_address,
     'save': save_notebook,
     'email': add_email,
