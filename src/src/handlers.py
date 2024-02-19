@@ -2,11 +2,13 @@ from classes import AddressBook, Record, Notes, BodyOfNote, TegNote
 from cleaner import sorting
 import pickle
 import re
+from pathlib import Path
 
 
 NOTEBOOK = AddressBook()
 FILE_NAME = 'data.bin'
 NOTES = Notes()
+main_folder_path = None
 contacts = {}
 phone_pattern = r'\d+'
 name_pattern = r'[a-zA-Z_]+'
@@ -215,6 +217,8 @@ def show_all(operator):
 
 # Launch cleaner
 def launch_cleaner(operator):
+    global main_folder_path
+    main_folder_path = Path(input('Enter the path for sorting and cleaning: '))
     sorting()
 
 # Simple farewell function
@@ -259,7 +263,8 @@ def commands(operator):
         Type "change [name] [old phone number] [new phone number]" to add new contact.\n \
         Type "note [id] find note.\n \
         Type "delete note [id] to delete note.\n \
-        Type "notes to see all notes.\n \
+        Type "notes" to see all notes.\n \
+        To launch cleaner type "clean" \n \
         And the ultimate command: \n \
         Type "end" to exit'
 

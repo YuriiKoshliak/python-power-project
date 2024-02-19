@@ -5,8 +5,6 @@ import gzip
 import os
 from pathlib import Path
 
-# Він ще не готовий, працюю над ним
-
 
 CYRILLIC_SYMBOLS = "абвгдеёжзийклмнопрстуфхцчшщъыьэюяєіїґ"
 TRANSLATION = ("a", "b", "v", "g", "d", "e", "e", "j", "z", "i", "j", "k", "l", "m", "n", "o", "p", "r", "s", "t", "u",
@@ -21,7 +19,6 @@ for c, t in zip(CYRILLIC_SYMBOLS, TRANSLATION):
 
 folders_to_create = ["images", "documents", 'audio', 'video', 'archives', 'other']
 
-main_folder_path = Path(input('Enter the path for sorting and cleaning: '))
 
 images = ['.JPEG', '.PNG', '.JPG', '.SVG']
 documents = ['.DOC', '.DOCX', '.TXT', '.PDF', '.XLSX', '.PPTX']
@@ -54,7 +51,7 @@ def delete_empty_folders(path):
             os.rmdir(current_dir)
             deleted.add(current_dir)
 
-    print(f'Наступні пусті папки були видалені: {deleted}\n' if len(deleted) != 0 else "Пустих папок не знайдено\n")
+    print(f'The following empty folders were deleted: {deleted}\n' if len(deleted) != 0 else "No empty folders found\n")
 
 def normalize(name):
     try:
@@ -72,6 +69,7 @@ def unpack(archive_path, path_to_unpack):
 
 
 def move_rename_file(path):
+    from handlers import main_folder_path
     k = 1
     extension = path.suffix
     base = normalize(path.stem)
@@ -99,7 +97,7 @@ def move_rename_file(path):
                 found_archives.append(path.name)        
                 os.remove(path)
             except FileExistsError:
-                print(f'Архів {path} не вдалося розпакувати, бо папка {base} вже існує.\n')
+                print(f'The archive {path} ould not be unpacked because the folder {base} already exists.\n')
         else:
             unpack(path, main_folder_path / 'archives' / base)
             found_archives.append(path.name) 
@@ -120,7 +118,7 @@ def move_rename_file(path):
             path.rename(new_file_path)
         except FileExistsError:
             k += 1
-            print (f'Файл {new_file_path.name} вже існує в папці {new_folder}, назву буде змінено на {base}{k}\n')
+            print (f'The file {new_file_path.name} already exists in the folder {new_folder}, the name will be changed to {base}{k}\n')
             mega_name = new_file_path.with_stem(f'{base}{k}')
             try:
                 path.rename(mega_name)
@@ -143,7 +141,7 @@ def monster_sort(path):
 
 
 def sorting():
-               
+        from handlers import main_folder_path  
         for folder_name in folders_to_create:
             try:
                 (main_folder_path / folder_name).mkdir()
@@ -154,20 +152,20 @@ def sorting():
 
         delete_empty_folders(main_folder_path)
 
-        print(f'У папці було знайдено дивні розширення: {found_extensions}.\
- Для вашої безпеки всі такі файли {found_other} було переміщено до папки "other".\n' if len(found_extensions) != 0 else "")
+        print(f'Strange extensions were found in the folder: {found_extensions}.\
+ For your safety, all such files {found_other} have been moved to the “other” folder.\n' if len(found_extensions) != 0 else "")
         
-        print(f'''Відсортовані файли: 
+        print(f'''Sorted files: 
               
-              зображення: {found_images} 
+              images: {found_images} 
 
-              відеофайли: {found_video} 
+              video files: {found_video} 
 
-              документи: {found_documents} 
+              documents: {found_documents} 
 
-              музика: {found_audio} 
+              music: {found_audio} 
 
-              архіви: {found_archives} \n''')
+              archives: {found_archives} \n''')
 
         
         
