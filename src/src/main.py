@@ -10,7 +10,7 @@ def main_action(func):
         try:
             func(operator)
         except AttributeError:
-            print('Check twice or type the "commands" to print the list of commands!')
+            print('Check twice or type the "help" to print the list of commands!')
         except Exception as e:
             message = str(e)
             print(message)
