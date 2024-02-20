@@ -101,7 +101,7 @@ class Record:
             else:
                 raise ValueError("Invalid email address")
 
-    def days_to_birthday(self): #Треба додати взаємодію з Birthday
+    def days_to_birthday(self):
         if self.birthday:
             modified_date = self.birthday.value.replace(year=date.today().year + 1) \
             if self.birthday.value.month == 1 \
@@ -109,7 +109,7 @@ class Record:
         
             result = modified_date - date.today()
 
-            return result
+            return result.days
         else:
             return f'No B Day :('
         
@@ -172,8 +172,8 @@ class Notes(UserDict):
         self.teg = ''
         self.text = ''
 
-    def __str__(self):
-        return f"Note {self.count}: /n {self.teg} /n {self.text}"
+    # def __str__(self):
+    #     return f"Note {self.count}: /n {self.teg} /n {self.text}"
     
     def add_note(self, body_of_note, teg=None):
         self.count += 1
@@ -184,33 +184,35 @@ class Notes(UserDict):
 
     def find_note(self, idx: str):
         if idx.isdigit():
-            return self.data.get(int(idx))
+            try:
+                return f"ID: {idx}, Tag: {self.data[int(idx)][0].value}, Text: {self.data[int(idx)][1].value}"
+            except:
+                return f"ID is incorrect or the note doesnt exist!"
         else:
-            for key, value in self.data.items():
-                if str(value[0]).find(idx) != -1 or str(value[1]).find(idx) != -1:
-                    return self.data.get(key)
+            for key in self.data:
+                if self.data[key][0].value != None and \
+                 self.data[key][0].value.find(idx) != -1 or self.data[key][1].value.find(idx) != -1:
+                    return f"ID: {key}, Tag: {self.teg.value}, Text: {self.text.value}"
+
+                if self.data[key][1].value.find(idx) != -1:
+                    return f"ID: {key}, Tag: {self.teg.value}, Text: {self.text.value}"
                 else:
-                    continue
-        
-    def delete_note(self, idx: str):
+                    return f'The search turned up nothing!'
+                    
+    def delete_note(self, idx):
         if idx.isdigit():
-            return self.data.pop(int(idx))
+            self.data.pop(int(idx))
         else:
-            for key, value in self.data.items():
-                if str(value[0]).find(idx) != -1 or str(value[1]).find(idx) != -1:
-                    return self.data.pop(key)
-                else:
-                    continue
-        
+            print('Type the index, please!')
+
     def edite_note(self, idx, new_text: str):
-        self.data[int(idx)] = new_text
-        return self.data[int(idx)]
+        self.data[int(idx)][1].value = new_text
 
     def add_note_teg(self, idx, teg: str):
-        if self.data.get(idx) == '':
-            self.data[int(idx)][0] = teg
-        else:
-            return f'Notes nr.{idx} have a tags. You must change it.'
+        try:
+            self.data[int(idx)][0].value = teg
+        except TypeError:
+            return f'Check twice!'
 
     def sort_note_for_teg(self):
         self.list_tegs = []
@@ -258,11 +260,22 @@ class AddressBook(UserDict):
     def sorting_of_notes(self):
         return self.notes.sort_note_for_teg()
 
-    def delete_the_note(self, word):
-        return self.notes.delete_note(word)
+    def delete_the_note(self, id):
+        return self.notes.delete_note(id)
       
     def show_all_notes(self):
-        return self.notes.data
+        list = ''
+        for i in self.notes.data:
+            list += f"ID: {i}, Tag: {self.notes.data[i][0].value}, Text: {self.notes.data[i][1].value} \n"
+
+        return list
+
+    def list_with_birthdays(self, days: int):
+        list = ''
+        for i in filter(lambda i: i.days_to_birthday() < days, self.data.values()):
+            list += f'{i}\n'
+        
+        return list
                      
     def __iter__(self):
         return self
@@ -295,15 +308,42 @@ if __name__ == '__main__':
     book = AddressBook()
 
     # Creating a record for John
-    john_record = Record("John")
-    john_record.add_phone("1234567890")
-    john_record.add_phone("5555555555")
-    john_record.add_birthday("1994-01-20")
-    john_record.email = 'test@gmail.com'
-    print(john_record)
+    test_record = Record("John")
+    test_record.add_phone("1234567890")
+    test_record.add_phone("5555555555")
+    test_record.add_birthday("1994-02-20")
+    test_record.email = 'test@gmail.com'
+    print(test_record)
+
+    test_record1 = Record("Jane")
+    test_record1.add_phone("1234567890")
+    test_record1.add_phone("5555555555")
+    test_record1.add_birthday("1994-02-22")
+
+    test_record2 = Record("Joe")
+    test_record2.add_phone("1234567890")
+    test_record2.add_phone("5555555555")
+    test_record2.add_birthday("1994-02-25")
 
     # Adding John's record to address book
-    book.add_record(john_record)
-    john_record.add_address('Nowhere')
-    print(john_record.address.value)
+    book.add_record(test_record)
+    book.add_record(test_record1)
+    book.add_record(test_record2)
+    test_record.add_address('Nowhere')
+    print(test_record.address.value)
 
+    print(book.list_with_birthdays(2))
+
+    book.write_note('kjlkjlkklj')
+    book.write_note('qweqweqweqwe')
+    book.add_teg_to_note(1, 'adad')
+
+    # print(book.search_of_note('1'))
+    # print(book.search_of_note('2'))
+
+    # # print(book.search_of_note('1'))
+    # print(book.search_of_note('2'))
+
+    print(book.show_all_notes())
+
+    

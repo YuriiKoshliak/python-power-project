@@ -59,17 +59,20 @@ def add_contact(operator):
     phoneNum = operand_maker(operator)[1]
 
     record = NOTEBOOK.find(phoneName)
-    if record != None:
-        record.add_phone(phoneNum[0])
+    try:
+        if record != None:
+            record.add_phone(phoneNum[0])
 
-        return f'Phone to contact {phoneName} has been added!'   
-    else:
-        new_record = Record(phoneName)
-        new_record.add_phone(phoneNum[0])
+            return f'Phone to contact {phoneName} has been added!'   
+        else:
+            new_record = Record(phoneName)
+            new_record.add_phone(phoneNum[0])
 
-        NOTEBOOK.add_record(new_record)
+            NOTEBOOK.add_record(new_record)
 
-        return f'Contact {phoneName} has been added!' 
+            return f'Contact {phoneName} has been added!' 
+    except ValueError:
+        return "Wrong phone number format!"
 
 # Adds a birthday to the contacts
 def add_birthday(operator):
@@ -107,55 +110,70 @@ def add_email(operator):
     else:
         return f'Woopsie no contact with {contactData[0]} name!'
 
-# Notes functions
+# Adds note
 def add_note(operator):
     trimmed = re.sub('add note', '', operator).strip()
-    note = BodyOfNote(trimmed)
 
-    NOTES.add_note(note)
+    if len(trimmed) >= 1:
+        NOTEBOOK.write_note(trimmed)
 
-    return f'Note added!'
+        return 'Note added!'
+    else:
+        return "You should've write something!"
 
-def add_teg(operator):
-    trimmed = re.sub('add teg', '', operator).strip()
-    index = re.search(r'[0-9]+', trimmed).group().capitalize()
+# Adds tag to the note with specified ID
+def add_tag(operator):
+    trimmed = re.sub('tag', '', operator).strip()
+    index = re.search(r'[0-9]+', trimmed).group()
     teg = re.sub(index, '', trimmed).strip()
-    
+
     NOTEBOOK.add_teg_to_note(index, teg)
-    
     return f'Note {index} has teg: {teg}.'
 
+# Finds note with specified ID/Tag/Word
 def find_note(operator):
     trimmed = re.sub('note', '', operator).strip()
     note = NOTEBOOK.search_of_note(trimmed)
 
     return note
 
+# Edits note with specified ID
 def edit_note(operator):
     trimmed = re.sub('edit note', '', operator).strip()
-    index = re.search(r'[0-9]+', trimmed).group().capitalize()
+    index = re.search(r'[0-9]+', trimmed).group()
     new_text = re.sub(index, '', trimmed).strip()
 
     NOTEBOOK.change_note(index, new_text)
-   
+
     return f'Note {index} was updated!'
 
+# Deletes note with specified ID
 def delete_note(operator):
     trimmed = re.sub('delete note', '', operator).strip()
-    NOTEBOOK.delete_the_note(trimmed)
+    
+    try:
+        NOTEBOOK.delete_the_note(trimmed)
+        return f'Note {trimmed} was deleted!'
+    except KeyError:
+        return f'No note with that key!'
 
-    return f'Note {trimmed} was deleted!'
+# This function isn't working so far
+def sort_notes(operator): 
+    # notes = NOTEBOOK.sorting_of_notes()
+    ...
+    # return notes
 
-def sort_notes():
-    notes = NOTEBOOK.sorting_of_notes()
+# Shows all notes
+def show_notes(operator):
+    notes = NOTEBOOK.show_all_notes()
 
-    return notes
+    return f'{notes}'
 
-def show_notes():
-    # для цього краще реалізувати ітератор в класі
-    notes = NOTEBOOK.show_all_notes
+# Shows birthdays within certain time range
+def show_birthdays(operator):
+    trimmed = re.sub('birthdays', '', operator).strip()
 
-    return notes
+    return NOTEBOOK.list_with_birthdays(int(trimmed))
 
 # Update the contact number
 def change(operator):
@@ -163,20 +181,14 @@ def change(operator):
     phoneNums = operand_maker(operator)[1]
 
     contact = NOTEBOOK.find(phoneName)
-    contact.edit_phone(phoneNums[0], phoneNums[1])
+    try:
+        contact.edit_phone(phoneNums[0], phoneNums[1])
 
-    return f'Contact {phoneName} has been updated!'
+        return f'Contact {phoneName} has been updated!'
+    except ValueError:
+        return "Wrong phone number format or no such number!"
 
 # Delete the contact number for a certain contact
-def delete_phone(operator):
-    phoneName = operand_maker(operator)[0]
-    phoneNums = operand_maker(operator)[1]
-
-    contact = NOTEBOOK.find(phoneName)
-    contact.remove_phone(phoneNums[0])
-
-    return f'Phone {phoneNums[0]} was deleted fron contact {phoneName}!'
-
 def delete_phone(operator):
     phoneName = operand_maker(operator)[0]
     phoneNums = operand_maker(operator)[1]
@@ -226,21 +238,22 @@ def goodbye(operator):
     save_notebook(operator)
     return 'Your data is saved! Good bye!'
 
-# saving a notebook
+# Saving a notebook
 def save_notebook(operator):
     try:
         with open (FILE_NAME, "wb") as file:
             pickle.dump(NOTEBOOK.data, file)
-            
+        
+        return "Data was saved to file!"
     except IOError as E:
         print(E)
 
-# loadind a notebook
+# Loadind a notebook
 def load_notebook(operator):
     try:
         with open (FILE_NAME, "rb") as file:
             NOTEBOOK.data = pickle.load(file)
-        print("Data was loaded from save")
+        return "Data was loaded from file!"
     except IOError as E:
         print(E)
 
@@ -254,18 +267,27 @@ def commands(operator):
         Type "birthday [name] [birthday date in date format]" to add bDay to the contact.\n \
         Type "delete phone [name] [phone number]" to delete phone from the contact.\n \
         Type "delete [name]" to delte the contact.\n \
-        Type "show all" to see all contacts \n \
+        Type "birthdays [period of time in days]" to show the contacts with birthdays within this periond.\n \
+        Type "show all" to see all contacts. \n \
+            <-------------------------------->\n \
         To save data as file or work with saved book use next commands: \n \
+            \n \
         Type "save" to save the address book (rewrite old book!!!) \n \
-        Type "load" to open saved file \n \
+        Type "load" to open saved file. \n \
+            <-------------------------------->\n \
         To work with notes use next commands: \n \
+            \n \
         Type "add note [text]" to add new note.\n \
         Type "change [name] [old phone number] [new phone number]" to add new contact.\n \
-        Type "note [id] find note.\n \
+        Type "note [id/tag/word] find note.\n \
+        Type "tag [id] to add tag.\n \
         Type "delete note [id] to delete note.\n \
         Type "notes" to see all notes.\n \
+            <-------------------------------->\n \
         To launch cleaner type "clean" \n \
+            <-------------------------------->\n \
         And the ultimate command: \n \
+            \n \
         Type "end" to exit'
 
 OPERATIONS = {
@@ -281,8 +303,10 @@ OPERATIONS = {
     'delete note': delete_note,
     'edit note': edit_note,
     'notes': show_notes,
+    'tag': add_tag,
     'goodbye': goodbye,
     'birthday': add_birthday,
+    'birthdays': show_birthdays,
     'address': add_address,
     'save': save_notebook,
     'email': add_email,
