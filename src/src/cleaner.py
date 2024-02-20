@@ -69,7 +69,7 @@ def unpack(archive_path, path_to_unpack):
 
 
 def move_rename_file(path):
-    from handlers import main_folder_path
+    from src.handlers import main_folder_path
     k = 1
     extension = path.suffix
     base = normalize(path.stem)
@@ -141,7 +141,7 @@ def monster_sort(path):
 
 
 def sorting():
-        from handlers import main_folder_path  
+        from src.handlers import main_folder_path  
         for folder_name in folders_to_create:
             try:
                 (main_folder_path / folder_name).mkdir()

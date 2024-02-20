@@ -1,4 +1,4 @@
-from handlers import get_handler
+from src.handlers import get_handler
 
 
 waiting = True
