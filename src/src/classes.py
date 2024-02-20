@@ -2,6 +2,7 @@ from collections import UserDict
 from datetime import date, datetime
 import re
 
+
 class Field:
     def __init__(self, value):
         self.__value = None
@@ -45,7 +46,6 @@ class Phone(Field):
         else:
             raise ValueError
 
-# я тут пропоную свою реалізацыю якщо шо feel free щось міняти
 class Birthday(Field):
     def __init__(self, value):
         super().__init__(value)
@@ -63,7 +63,6 @@ class Birthday(Field):
         else:
             raise ValueError
             
-# basic class with no extra validation, could be expanded
 class Address(Field):
     def __init__(self, value):
         super().__init__(value)
@@ -120,8 +119,8 @@ class Record:
     def add_birthday(self, date):
         try:
             self.birthday = Birthday(date)  
-        except ValueError:
-            print('Wrong date format! Enter the date in format year-month-day!')
+        except:
+            raise ValueError
 
     def add_address(self, address):
         self.address = Address(address)
@@ -173,7 +172,7 @@ class Notes(UserDict):
         self.text = ''
 
     # def __str__(self):
-    #     return f"Note {self.count}: /n {self.teg} /n {self.text}"
+    #     ...
     
     def add_note(self, body_of_note, teg=None):
         self.count += 1
@@ -187,7 +186,7 @@ class Notes(UserDict):
             try:
                 return f"ID: {idx}, Tag: {self.data[int(idx)][0].value}, Text: {self.data[int(idx)][1].value}"
             except:
-                return f"ID is incorrect or the note doesnt exist!"
+                raise ValueError
         else:
             for key in self.data:
                 if self.data[key][0].value != None and \
@@ -268,14 +267,14 @@ class AddressBook(UserDict):
         for i in self.notes.data:
             list += f"ID: {i}, Tag: {self.notes.data[i][0].value}, Text: {self.notes.data[i][1].value} \n"
 
-        return list
+        return list[:-1]
 
     def list_with_birthdays(self, days: int):
         list = ''
         for i in filter(lambda i: i.days_to_birthday() < days, self.data.values()):
             list += f'{i}\n'
         
-        return list
+        return list[:-1]
                      
     def __iter__(self):
         return self
@@ -298,7 +297,7 @@ class AddressBook(UserDict):
             for i in result:
                 string_view += f'{i}\n'
             
-            yield string_view
+            yield string_view[:-1]
             
             self.min_len += end+self.min_len
 
@@ -337,13 +336,3 @@ if __name__ == '__main__':
     book.write_note('kjlkjlkklj')
     book.write_note('qweqweqweqwe')
     book.add_teg_to_note(1, 'adad')
-
-    # print(book.search_of_note('1'))
-    # print(book.search_of_note('2'))
-
-    # # print(book.search_of_note('1'))
-    # print(book.search_of_note('2'))
-
-    print(book.show_all_notes())
-
-    

@@ -72,7 +72,8 @@ def add_contact(operator):
 
             return f'Contact {phoneName} has been added!' 
     except ValueError:
-        return "Wrong phone number format!"
+        return "Wrong phone number format!\n"+ \
+            "Try using format of 0123456789 - 10 digits, no symbols."
 
 # Adds a birthday to the contacts
 def add_birthday(operator):
@@ -80,9 +81,12 @@ def add_birthday(operator):
 
     record = NOTEBOOK.find(contactData[0])
     if record != None:
-        record.add_birthday(contactData[1])
+        try:
+            record.add_birthday(contactData[1])
 
-        return f'Contact {contactData[0]} has a birthday now!'   
+            return f'Contact {contactData[0]} has a birthday now!'
+        except ValueError:
+            return 'Wrong date format! Enter the date in format year-month-day!'
     else:
         return f'Woopsie no contact with {contactData[0]} name!' 
 
@@ -125,27 +129,48 @@ def add_note(operator):
 def add_tag(operator):
     trimmed = re.sub('tag', '', operator).strip()
     index = re.search(r'[0-9]+', trimmed).group()
-    teg = re.sub(index, '', trimmed).strip()
+    tag = re.sub(index, '', trimmed).strip()
 
-    NOTEBOOK.add_teg_to_note(index, teg)
-    return f'Note {index} has teg: {teg}.'
+    try:
+        NOTEBOOK.search_of_note(index)
+        if len(tag) >=1:
+            NOTEBOOK.add_teg_to_note(index, tag)
+
+            return f'Note {index} has teg: {tag}.'
+        else:
+            return "Woopsie! You should've written something."
+    except ValueError:
+        return "ID is incorrect or the note doesnt exist!"
 
 # Finds note with specified ID/Tag/Word
 def find_note(operator):
     trimmed = re.sub('note', '', operator).strip()
-    note = NOTEBOOK.search_of_note(trimmed)
-
-    return note
+    try:
+        note = NOTEBOOK.search_of_note(trimmed)
+        if note is None:
+            return "Whoopsie-daisy! Seems like there's no such note."+ \
+                "Or is it a typo?" 
+        else:
+            return note
+    except ValueError:
+        return "ID is incorrect or the note doesnt exist!"
 
 # Edits note with specified ID
 def edit_note(operator):
     trimmed = re.sub('edit note', '', operator).strip()
     index = re.search(r'[0-9]+', trimmed).group()
     new_text = re.sub(index, '', trimmed).strip()
+    
+    try:
+        NOTEBOOK.search_of_note(index)
+        if len(new_text) >=1:
+            NOTEBOOK.change_note(index, new_text)
 
-    NOTEBOOK.change_note(index, new_text)
-
-    return f'Note {index} was updated!'
+            return f'Note {index} was updated!'
+        else:
+            return "Woopsie! You should've written something."
+    except ValueError:
+        return "ID is incorrect or the note doesnt exist!"
 
 # Deletes note with specified ID
 def delete_note(operator):
@@ -166,14 +191,19 @@ def sort_notes(operator):
 # Shows all notes
 def show_notes(operator):
     notes = NOTEBOOK.show_all_notes()
-
-    return f'{notes}'
+    if len(notes) < 1:
+        return "Whoopsie-daisy! Seems like there's no notes. Wanna add one?"
+    else:
+        return notes
 
 # Shows birthdays within certain time range
 def show_birthdays(operator):
     trimmed = re.sub('birthdays', '', operator).strip()
-
-    return NOTEBOOK.list_with_birthdays(int(trimmed))
+    result = NOTEBOOK.list_with_birthdays(int(trimmed))
+    if len(result) < 1:
+        return f"Oh wow! It seenms like there's no birthdays within {trimmed} days!"
+    else:
+        return result
 
 # Update the contact number
 def change(operator):
@@ -186,7 +216,9 @@ def change(operator):
 
         return f'Contact {phoneName} has been updated!'
     except ValueError:
-        return "Wrong phone number format or no such number!"
+        return "Wrong phone number format or no such number!\n"+ \
+            "Try using format of 0123456789 - 10 digits, no symbols."+ \
+                "Or make sure that contact is exist."
 
 # Delete the contact number for a certain contact
 def delete_phone(operator):
@@ -194,9 +226,13 @@ def delete_phone(operator):
     phoneNums = operand_maker(operator)[1]
 
     contact = NOTEBOOK.find(phoneName)
-    contact.remove_phone(phoneNums[0])
+    try:
+        contact.remove_phone(phoneNums[0])
 
-    return f'Phone {phoneNums[0]} was deleted fron contact {phoneName}!'
+        return f'Phone {phoneNums[0]} was deleted fron contact {phoneName}!'
+    except ValueError:
+        return "No such phone or there's a typo. "+\
+            "Check phone format maybe, it sholuld be 10 digits no symbols."
 
 # Delete the contact
 def delete(operator):
@@ -206,16 +242,20 @@ def delete(operator):
         raise Exception('No name? Enter the contact in the format: "Name" "Phone Number"')
     
     capitalized_name = phoneName.group().capitalize()
-    NOTEBOOK.delete(capitalized_name)
+    finded = NOTEBOOK.find(capitalized_name)
+    if finded != None:
+        NOTEBOOK.delete(capitalized_name)
 
-    return f'Contact {capitalized_name} was deleted!'
+        return f'Contact {capitalized_name} was deleted!'
+    else:
+        return 'Typo or no such contact!'
 
 # Displays the phone number of the requested contact
 def contact(operator):
     phoneName = re.search(name_pattern, operator.replace("contact", ""))
 
     if not phoneName:
-        raise Exception('No name? Enter the contact in the format: "Name" "Phone Number"')
+        raise Exception('No name? Enter the contact Name')
     
     capitalized_name = phoneName.group().capitalize()
     record = NOTEBOOK.find(capitalized_name)
@@ -261,8 +301,10 @@ def load_notebook(operator):
 def commands(operator):
     return 'The list of commands: \n \
         Type "contact [name of the contact]" to see its phone num.\n \
-        Type "phone [phone of the contact]" to see if its exist.\n \
-        Type "add [name] [phone number]" to add new contact.\n \
+        Type "phone [phone of the contact'+ \
+            'in the format of 0123456789 - 10 digits, no symbols]" to see if its exist.\n \
+        Type "add [name] [phone number in the format of 0123456789 - 10 digits,'+ \
+            'no symbols]" to add new contact.\n \
         Type "change [name] [old phone number] [new phone number]" to change phone number.\n \
         Type "birthday [name] [birthday date in date format]" to add bDay to the contact.\n \
         Type "email [name] [email]" to add email to the contact.\n \
@@ -289,7 +331,7 @@ def commands(operator):
             <-------------------------------->\n \
         And the ultimate command: \n \
             \n \
-        Type "end" to exit'
+        Type "end" to exit.'
 
 OPERATIONS = {
     'hello': hello,
