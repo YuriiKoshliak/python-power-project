@@ -1,4 +1,4 @@
-from handlers import get_handler
+from src.handlers import get_handler, load_notebook, show_birthdays
 
 
 waiting = True
@@ -24,6 +24,8 @@ def main(operator) -> str:
     print(handler(operator))
 
 def entry_point():
+    load_notebook()
+    show_birthdays(7)
     while waiting == True:
         operator = input(":")
         if operator in goodbyes:

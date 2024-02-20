@@ -1,5 +1,5 @@
-from classes import AddressBook, Record, Notes, BodyOfNote, TegNote
-from cleaner import sorting
+from src.classes import AddressBook, Record, Notes, BodyOfNote, TegNote
+from src.cleaner import sorting
 import pickle
 import re
 from pathlib import Path

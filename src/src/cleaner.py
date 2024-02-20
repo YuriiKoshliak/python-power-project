@@ -5,29 +5,22 @@ import gzip
 import os
 from pathlib import Path
 
-
 CYRILLIC_SYMBOLS = "абвгдеёжзийклмнопрстуфхцчшщъыьэюяєіїґ"
 TRANSLATION = ("a", "b", "v", "g", "d", "e", "e", "j", "z", "i", "j", "k", "l", "m", "n", "o", "p", "r", "s", "t", "u",
                "f", "h", "ts", "ch", "sh", "sch", "", "y", "", "e", "yu", "ya", "je", "i", "ji", "g")
-
 TRANS = {}
 
 for c, t in zip(CYRILLIC_SYMBOLS, TRANSLATION):
-    
     TRANS[ord(c)] = t
     TRANS[ord(c.upper())] = t.upper()
 
 folders_to_create = ["images", "documents", 'audio', 'video', 'archives', 'other']
-
-
 images = ['.JPEG', '.PNG', '.JPG', '.SVG']
 documents = ['.DOC', '.DOCX', '.TXT', '.PDF', '.XLSX', '.PPTX']
 audio = ['.MP3', '.OGG', '.WAV', '.AMR']
 video = ['.AVI', '.MP4', '.MOV', '.MKV']
 archives = ['.ZIP', '.GZ', '.TAR']
-
 found_extensions = set()
-
 found_images = []
 found_documents = []
 found_audio = []
@@ -35,12 +28,11 @@ found_video = []
 found_archives = []
 found_other = []
 
+# Removes empty directories from a specified path
 def delete_empty_folders(path):
-
     deleted = set()
     
     for current_dir, subdirs, files in os.walk(path, topdown=False):
-
         still_has_subdirs = False
         for subdir in subdirs:
             if os.path.join(current_dir, subdir) not in deleted:
@@ -50,9 +42,9 @@ def delete_empty_folders(path):
         if not any(files) and not still_has_subdirs:
             os.rmdir(current_dir)
             deleted.add(current_dir)
-
     print(f'The following empty folders were deleted: {deleted}\n' if len(deleted) != 0 else "No empty folders found\n")
 
+# Standardizes filenames by replacing non-alphanumeric characters.
 def normalize(name):
     try:
         base, extension = name.rsplit('.', 1)
@@ -63,13 +55,13 @@ def normalize(name):
         trans_name = name.translate(TRANS)
         return re.sub(r'\W', "_", trans_name)
      
-
+# Extracts contents of an archive to a specified directory.
 def unpack(archive_path, path_to_unpack):
     shutil.unpack_archive(archive_path, path_to_unpack)
 
-
+# Sorts and organizes files by type, handles archives.
 def move_rename_file(path):
-    from handlers import main_folder_path
+    from src.handlers import main_folder_path
     k = 1
     extension = path.suffix
     base = normalize(path.stem)
@@ -112,6 +104,7 @@ def move_rename_file(path):
 
     new_file_path = main_folder_path / new_folder / new_name
 
+# Attempts to rename a file, retries with incremented suffix on error.
     def cykle_try(new_file_path):
         nonlocal k
         try:
@@ -127,10 +120,8 @@ def move_rename_file(path):
 
     cykle_try(new_file_path)
 
-
-
+# Recursively sorts files and directories using custom rules.
 def monster_sort(path):
-    
     for element in path.iterdir():
         if element.name not in folders_to_create:
             if element.is_dir():
@@ -138,10 +129,9 @@ def monster_sort(path):
             else:
                 move_rename_file(element)
                 
-
-
+# Initializes sorting process, creates folders, and sorts files.
 def sorting():
-        from handlers import main_folder_path  
+        from src.handlers import main_folder_path  
         for folder_name in folders_to_create:
             try:
                 (main_folder_path / folder_name).mkdir()
@@ -149,12 +139,9 @@ def sorting():
                 ...
         
         monster_sort(main_folder_path)
-
         delete_empty_folders(main_folder_path)
-
         print(f'Strange extensions were found in the folder: {found_extensions}.\
  For your safety, all such files {found_other} have been moved to the “other” folder.\n' if len(found_extensions) != 0 else "")
-        
         print(f'''Sorted files: 
               
               images: {found_images} 
@@ -166,9 +153,6 @@ def sorting():
               music: {found_audio} 
 
               archives: {found_archives} \n''')
-
-        
-        
 
 if __name__ == "__main__":
     sorting()
