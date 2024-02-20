@@ -265,6 +265,7 @@ def commands(operator):
         Type "add [name] [phone number]" to add new contact.\n \
         Type "change [name] [old phone number] [new phone number]" to change phone number.\n \
         Type "birthday [name] [birthday date in date format]" to add bDay to the contact.\n \
+        Type "email [name] [email]" to add email to the contact.\n \
         Type "delete phone [name] [phone number]" to delete phone from the contact.\n \
         Type "delete [name]" to delte the contact.\n \
         Type "birthdays [period of time in days]" to show the contacts with birthdays within this periond.\n \

@@ -21,6 +21,7 @@ The assistant bot offers the following set of commands for interaction:
 - `add [name] [phone number]` - add a new contact. The phone number format should be 10 digits.
 - `change [name] [old phone number] [new phone number]` - change the contact's phone number.
 - `birthday [name] [date of birth in date format]` - add a birthday to the contact.
+- `email [name] [email]` - add an email address to an existing contact.
 - `delete phone [name] [phone number]` - delete the phone number from the contact.
 - `delete [name]` - delete the contact.
 - `birthdays [period of time in days]` - displays a list of contacts who have birthdays coming up within the specified number of days.
@@ -54,6 +55,7 @@ The assistant bot offers the following set of commands for interaction:
 - `add [ім'я] [номер телефону]` - додати новий контакт. Телефонний номер повинен бути у 10-ти циферному форматі (0123456789).
 - `change [ім'я] [старий номер телефону] [новий номер телефону]` - змінити номер телефону контакту.
 - `birthday [ім'я] [дата народження у форматі дати]` - додати дату народження до контакту.
+- `email [ім'я] [email]` - додати електронну адресу до існуючого контакту.
 - `delete phone [ім'я] [номер телефону]` - видалити номер телефону з контакту.
 - `delete [ім'я]` - видалити контакт.
 - `birthdays [кількість днів]` - показує список контактів, у яких день народження настає протягом зазначеного періоду часу. 
