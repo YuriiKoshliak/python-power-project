@@ -24,8 +24,8 @@ def main(operator) -> str:
     print(handler(operator))
 
 def entry_point():
-    load_notebook(operator)
-    show_birthdays(7)
+    load_notebook(None)
+    show_birthdays("7")
     while waiting == True:
         operator = input(":")
         if operator in goodbyes:
