@@ -14,6 +14,9 @@ To run the assistant bot, use the command:
 
 This command activates the bot, and you can use it anywhere in the system.
 
+During each launch, the bot will load the notebook from a file if it was previously saved. 
+It will also display a list of people who have a birthday coming up soon.
+
 The assistant bot offers the following set of commands for interaction:
 
 - `contact [contact name]` - view the contact's phone number.
@@ -47,6 +50,9 @@ The assistant bot offers the following set of commands for interaction:
 `run-helper`
 
 Ця команда активує бота, і ви можете використовувати його у будь-якому місці системи.
+
+Під час кожного запуску бот буде завантажувати з файла записник, якщо раніше він був збережений.
+Також буде виведено список осіб, у яких скоро буде День народження.
 
 Бот помічник пропонує наступний набір команд для взаємодії:
 
