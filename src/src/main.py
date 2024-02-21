@@ -25,8 +25,12 @@ def main(operator) -> str:
 
 def entry_point():
     print(load_notebook(None))
-    if show_birthdays("7"):
-        print(f"Someone has a birthday soon: {show_birthdays("7")}")
+    try:
+        birthday_message = show_birthdays("7")
+        if not birthday_message.startswith("Oh wow!"):
+            print(f"Someone has a birthday soon: {birthday_message}")
+    except TypeError as e:
+        print("I need more information. Perhaps you should add a birthday to some contact.")
     while waiting == True:
         operator = input(":")
         if operator in goodbyes:
