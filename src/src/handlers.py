@@ -7,6 +7,7 @@ from pathlib import Path
 
 NOTEBOOK = AddressBook()
 FILE_NAME = 'data.bin'
+FILE_NAME_NOTES = 'data2.bin'
 NOTES = Notes()
 main_folder_path = None
 contacts = {}
@@ -283,6 +284,9 @@ def save_notebook(operator):
     try:
         with open (FILE_NAME, "wb") as file:
             pickle.dump(NOTEBOOK.data, file)
+
+        with open (FILE_NAME_NOTES, "wb") as file2:
+            pickle.dump(NOTEBOOK.notes.data, file2)
         
         return "Data was saved to file!"
     except IOError as E:
@@ -293,6 +297,9 @@ def load_notebook(operator):
     try:
         with open (FILE_NAME, "rb") as file:
             NOTEBOOK.data = pickle.load(file)
+        with open (FILE_NAME_NOTES, "rb") as file2:
+            NOTEBOOK.notes.data = pickle.load(file2)
+
         return "Data was loaded from file!"
     except IOError as E:
         print(E)
