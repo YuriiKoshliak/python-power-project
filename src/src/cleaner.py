@@ -153,6 +153,8 @@ def sorting():
               music: {found_audio} 
 
               archives: {found_archives} \n''')
+        
+        return "Sorting was completed successfully"
 
 if __name__ == "__main__":
     sorting()
