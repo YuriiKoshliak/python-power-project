@@ -24,7 +24,8 @@ def main(operator) -> str:
     print(handler(operator))
 
 def entry_point():
-    print(load_notebook(None))
+    load = load_notebook(None)
+    print(load) if load != None else None
     try:
         birthday_message = show_birthdays("7")
         if not birthday_message.startswith("Oh wow!"):

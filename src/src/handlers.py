@@ -290,7 +290,7 @@ def save_notebook(operator):
         
         return "Data was saved to file!"
     except IOError as E:
-        print(E)
+        return E
 
 # Loadind a notebook
 def load_notebook(operator):
@@ -301,8 +301,8 @@ def load_notebook(operator):
             NOTEBOOK.notes.data = pickle.load(file2)
 
         return "Data was loaded from file!"
-    except IOError as E:
-        print(E)
+    except IOError as e:
+        return e
 
 # Shows commad list
 def commands(operator):
